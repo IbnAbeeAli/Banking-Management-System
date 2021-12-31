@@ -1,0 +1,21 @@
+insert into accounttype
+values
+(0,'Savings Account'),
+(1,'Current Account');
+
+insert into accountstatustype
+values
+(0,'Active'),
+(1,'Unactive');
+
+insert into transactiontype
+values
+(0,'Withdrawl'),
+(1,'deposit'),
+(2,'check'),
+(3,'transfer money'),
+(4,'loanpayment')
+;
+
+insert into savingsinterestrates
+values (0,0,null);

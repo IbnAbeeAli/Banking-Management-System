@@ -1,0 +1,116 @@
+
+CREATE TABLE `accountstatustype` (
+  `AccountStatusTypeID` tinyint(4) NOT NULL,
+  `AccountStatusDescription` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`AccountStatusTypeID`)
+) ;
+
+CREATE TABLE `accounttype` (
+  `AccountTypeID` tinyint(4) NOT NULL,
+  `AccountTypeDescription` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`AccountTypeID`)
+) ;
+
+CREATE TABLE `transactiontype` (
+  `TransactionTypeID` tinyint(4) NOT NULL,
+  `TransactionTypeName` char(30) DEFAULT NULL,
+  PRIMARY KEY (`TransactionTypeID`)
+) ;
+
+CREATE TABLE `savingsinterestrates` (
+  `InterestSavingsRateID` tinyint(4) NOT NULL,
+  `InterestRateValue` decimal(18,9) DEFAULT NULL,
+  `InterestRateDescription` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`InterestSavingsRateID`)
+) ;
+
+
+CREATE TABLE `customer` (
+  `CustomerID` int auto_increment,
+  `CustomerAddress1` varchar(50) NOT NULL,
+  `CustomerFirstName` varchar(30) NOT NULL,
+  `CustomerLastName` varchar(30) DEFAULT NULL,
+  `City` varchar(25) NOT NULL,
+  `State` varchar(5) DEFAULT NULL,
+  `ZipCode` varchar(10) DEFAULT NULL,
+  `EmailAddress` varchar(100) NOT NULL,
+  `CellPhone` varchar(20) NOT NULL,
+  `SSN` varchar(20) NOT NULL,
+  PRIMARY KEY (`CustomerID`),
+  UNIQUE KEY `EmailAddress` (`EmailAddress`),
+  UNIQUE KEY `SSN` (`SSN`),
+  UNIQUE KEY `CellPhone` (`CellPhone`)
+) ;
+
+
+
+CREATE TABLE `account` (
+  `AccountId` int(11) NOT NULL AUTO_INCREMENT,
+  `CustomerID` int(11) NOT NULL,
+  `AccountTypeID` tinyint(4) DEFAULT NULL,
+  `AccountStatusTypeID` tinyint(4) DEFAULT NULL,
+  `InterestSavingsRateID` tinyint(4) DEFAULT NULL,
+  `CurrentBalance` int (11) NOT NULL,
+  `dateCreated` datetime NOT NULL,
+  PRIMARY KEY (`AccountId`),
+  KEY `AccountTypeID` (`AccountTypeID`),
+  KEY `AccountStatusTypeID` (`AccountStatusTypeID`),
+  KEY `InterestSavingsRateID` (`InterestSavingsRateID`),
+  KEY `account_ibfk_4` (`CustomerID`),
+  CONSTRAINT `account_ibfk_1` FOREIGN KEY (`AccountTypeID`) REFERENCES `accounttype` (`AccountTypeID`),
+  CONSTRAINT `account_ibfk_2` FOREIGN KEY (`AccountStatusTypeID`) REFERENCES `accountstatustype` (`AccountStatusTypeID`),
+  CONSTRAINT `account_ibfk_3` FOREIGN KEY (`InterestSavingsRateID`) REFERENCES `savingsinterestrates` (`InterestSavingsRateID`),
+  CONSTRAINT `account_ibfk_4` FOREIGN KEY (`CustomerID`) REFERENCES `customer` (`CustomerID`)
+) ;
+
+
+CREATE TABLE `userlogins` (
+  `UserLoginId` int NOT NULL AUTO_INCREMENT,
+  `UserLogin` varchar(30) NOT NULL,
+  `UserPassword` varchar(25) DEFAULT NULL,
+  `AccountID` int DEFAULT NULL,
+  PRIMARY KEY (`UserLoginId`),
+  UNIQUE KEY `UserLogin` (`UserLogin`),
+  KEY `accunt_fk` (`AccountID`),
+  CONSTRAINT `accunt_fk` FOREIGN KEY (`AccountID`) REFERENCES `account` (`AccountId`)
+) ;
+
+
+CREATE TABLE `transactionlog` (
+  `TransactionID` int(11) NOT NULL AUTO_INCREMENT,
+  `TransactionDate` datetime DEFAULT NULL,
+  `TransactionTypeID` tinyint(4) DEFAULT NULL,
+  `TransactionAmount` decimal(38,2) DEFAULT NULL,
+  `AccountID` int(11) NOT NULL,
+  toaccountid int(11) default NUll,
+  `CustomerID` int(11) DEFAULT NULL,
+  `UserLoginID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`TransactionID`),
+  KEY `TransactionTypeID` (`TransactionTypeID`),
+  KEY `AccountID` (`AccountID`),
+  KEY `UserLoginID` (`UserLoginID`),
+  KEY `CustomerID` (`CustomerID`),
+  CONSTRAINT `transactionlog_ibfk_1` FOREIGN KEY (`TransactionTypeID`) REFERENCES `transactiontype` (`TransactionTypeID`),
+  CONSTRAINT `transactionlog_ibfk_2` FOREIGN KEY (`AccountID`) REFERENCES `account` (`AccountId`),
+  CONSTRAINT `transactionlog_ibfk_3` FOREIGN KEY (`UserLoginID`) REFERENCES `userlogins` (`UserLoginId`),
+  CONSTRAINT `transactionlog_ibfk_4` FOREIGN KEY (`CustomerID`) REFERENCES `customer` (`CustomerID`),
+  constraint tranasactionlog_ibfk_5 foreign key(toaccountid) references account(accountid)
+);
+
+CREATE TABLE `failedtransactionerrortype` (
+  `FailedTransactionErrorTypeID` tinyint(4) NOT NULL,
+  `faileedtransactiondescription` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`FailedTransactionErrorTypeID`)
+);
+
+CREATE TABLE `failedtransactionlog` (
+  `FailedTransactionID` int(11) NOT NULL AUTO_INCREMENT,
+  `FailedTransactionErrorTypeID` tinyint(4) NOT NULL,
+  `FailedTransactionErrorTime` datetime NOT NULL,
+  PRIMARY KEY (`FailedTransactionID`),
+  KEY `failedtransaction` (`FailedTransactionErrorTypeID`),
+  CONSTRAINT `failedtransaction` FOREIGN KEY (`FailedTransactionErrorTypeID`) REFERENCES `failedtransactionerrortype` (`FailedTransactionErrorTypeID`)
+);
+
+
+
