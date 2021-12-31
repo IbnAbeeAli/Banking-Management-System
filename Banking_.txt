@@ -1,0 +1,109 @@
+CREATE DATABASE `project` ;
+
+CREATE TABLE `accountstatustype` (
+  `AccountStatusTypeID` tinyint(4) NOT NULL,
+  `AccountStatusDescription` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`AccountStatusTypeID`)
+) ;
+
+CREATE TABLE `accounttype` (
+  `AccountTypeID` tinyint(4) NOT NULL,
+  `AccountTypeDescription` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`AccountTypeID`)
+) ;
+
+CREATE TABLE `transactiontype` (
+  `TransactionTypeID` tinyint(4) NOT NULL,
+  `TransactionTypeName` char(10) DEFAULT NULL,
+  `TransactionTypeDescription` varchar(50) DEFAULT NULL,
+  `TransactionFeeAmount` decimal(9,2) NOT NULL,
+  PRIMARY KEY (`TransactionTypeID`)
+) ;
+
+CREATE TABLE `savingsinterestrates` (
+  `InterestSavingsRateID` tinyint(4) NOT NULL,
+  `InterestRateValue` decimal(9,9) DEFAULT NULL,
+  `InterestRateDescription` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`InterestSavingsRateID`)
+) ;
+
+CREATE TABLE `account` (
+  `AccountId` int(11) NOT NULL AUTO_INCREMENT,
+  `AccountTypeID` tinyint(4) DEFAULT NULL,
+  `AccountStatusTypeID` tinyint(4) DEFAULT NULL,
+  `InterestSavingsRateID` tinyint(4) DEFAULT NULL,
+  `CurrentBalance` decimal(38,2) NOT NULL,
+  PRIMARY KEY (`AccountId`),
+  KEY `AccountTypeID` (`AccountTypeID`),
+  KEY `AccountStatusTypeID` (`AccountStatusTypeID`),
+  KEY `InterestSavingsRateID` (`InterestSavingsRateID`),
+  CONSTRAINT `account_ibfk_1` FOREIGN KEY (`AccountTypeID`) REFERENCES `accounttype` (`AccountTypeID`),
+  CONSTRAINT `account_ibfk_2` FOREIGN KEY (`AccountStatusTypeID`) REFERENCES `accountstatustype` (`AccountStatusTypeID`),
+  CONSTRAINT `account_ibfk_3` FOREIGN KEY (`InterestSavingsRateID`) REFERENCES `savingsinterestrates` (`InterestSavingsRateID`)
+) ;
+
+CREATE TABLE `userlogins` (
+  `UserLoginId` int(11) NOT NULL AUTO_INCREMENT,
+  `UserLogin` char(15) NOT NULL,
+  `UserPassword` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`UserLoginId`),
+  UNIQUE KEY `UserLogin` (`UserLogin`)
+);
+
+
+CREATE TABLE `loginaccount` (
+  `UserLoginId` int(11) DEFAULT NULL,
+  `AccountID` int(11) DEFAULT NULL,
+  KEY `user_fk` (`UserLoginId`),
+  KEY `accunt_fk` (`AccountID`),
+  CONSTRAINT `accunt_fk` FOREIGN KEY (`AccountID`) REFERENCES `account` (`AccountId`),
+  CONSTRAINT `user_fk` FOREIGN KEY (`UserLoginId`) REFERENCES `userlogins` (`UserLoginId`)
+);
+
+CREATE TABLE `customer` (
+  `AccountID` int(11) DEFAULT NULL,
+  `CustomerAddress1` varchar(30) NOT NULL,
+  `CustomerAddress2` varchar(30) DEFAULT NULL,
+  `CustomerFirstName` varchar(30) NOT NULL,
+  `CustomerMiddleName` varchar(1) DEFAULT NULL,
+  `CustomerLastName` varchar(30) DEFAULT NULL,
+  `City` varchar(20) NOT NULL,
+  `State` varchar(5) NOT NULL,
+  `ZipCode` varchar(10) NOT NULL,
+  `EmailAddress` varchar(40) NOT NULL,
+  `HomePhone` char(10) DEFAULT NULL,
+  `CellPhone` char(10) DEFAULT NULL,
+  `WorkPhone` char(10) DEFAULT NULL,
+  `SSN` char(13) NOT NULL,
+  `UserLoginID` int(11) DEFAULT NULL,
+  `CustomerID` int(11) NOT NULL,
+  PRIMARY KEY (`CustomerID`),
+  UNIQUE KEY `EmailAddress` (`EmailAddress`),
+  UNIQUE KEY `SSN` (`SSN`),
+  UNIQUE KEY `CellPhone` (`CellPhone`),
+  UNIQUE KEY `WorkPhone` (`WorkPhone`),
+  KEY `AccountID` (`AccountID`),
+  KEY `UserLoginID` (`UserLoginID`),
+  CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`AccountID`) REFERENCES `account` (`AccountId`),
+  CONSTRAINT `customer_ibfk_2` FOREIGN KEY (`UserLoginID`) REFERENCES `userlogins` (`UserLoginId`)
+) ;
+
+CREATE TABLE `transactionlog` (
+  `TransactionID` int(11) NOT NULL AUTO_INCREMENT,
+  `TransactionDate` datetime DEFAULT NULL,
+  `TransactionTypeID` tinyint(4) DEFAULT NULL,
+  `NewBalance` decimal(38,2) DEFAULT NULL,
+  `AccountID` int(11) DEFAULT NULL,
+  `CustomerID` int(11) DEFAULT NULL,
+  `UserLoginID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`TransactionID`),
+  KEY `TransactionTypeID` (`TransactionTypeID`),
+  KEY `AccountID` (`AccountID`),
+  KEY `UserLoginID` (`UserLoginID`),
+  KEY `CustomerID` (`CustomerID`),
+  CONSTRAINT `transactionlog_ibfk_1` FOREIGN KEY (`TransactionTypeID`) REFERENCES `transactiontype` (`TransactionTypeID`),
+  CONSTRAINT `transactionlog_ibfk_2` FOREIGN KEY (`AccountID`) REFERENCES `account` (`AccountId`),
+  CONSTRAINT `transactionlog_ibfk_3` FOREIGN KEY (`UserLoginID`) REFERENCES `userlogins` (`UserLoginId`),
+  CONSTRAINT `transactionlog_ibfk_4` FOREIGN KEY (`CustomerID`) REFERENCES `customer` (`CustomerID`)
+);
+
